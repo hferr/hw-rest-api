@@ -100,7 +100,7 @@ func TestHandlerCreateAgent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			handler := httpjson.NewHandler(tc.s)
+			handler := httpjson.NewHandler(tc.s, nil)
 			resp := test.DoHttpRequest(
 				handler,
 				http.MethodPost,
@@ -111,7 +111,7 @@ func TestHandlerCreateAgent(t *testing.T) {
 			gotCode := resp.StatusCode
 
 			if tc.wantCode != gotCode {
-				t.Fatalf("expected status code %d, got: %d", tc.wantCode, gotCode)
+				t.Errorf("expected status code %d, got: %d", tc.wantCode, gotCode)
 			}
 		})
 	}
@@ -192,10 +192,10 @@ func TestHandlerUpdateAgent(t *testing.T) {
 
 			reqJson, err := json.Marshal(tc.inputFn(req))
 			if err != nil {
-				t.Fatal(err)
+				t.Error(err)
 			}
 
-			handler := httpjson.NewHandler(tc.s)
+			handler := httpjson.NewHandler(tc.s, nil)
 			resp := test.DoHttpRequest(
 				handler,
 				http.MethodPatch,
@@ -206,7 +206,7 @@ func TestHandlerUpdateAgent(t *testing.T) {
 			gotCode := resp.StatusCode
 
 			if tc.wantCode != gotCode {
-				t.Fatalf("expected status code %d, got: %d", tc.wantCode, gotCode)
+				t.Errorf("expected status code %d, got: %d", tc.wantCode, gotCode)
 			}
 		})
 	}
