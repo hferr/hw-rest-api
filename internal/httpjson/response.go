@@ -33,8 +33,10 @@ func newAgentResponse(agent app.Agent) agentResponse {
 }
 
 var errStatusMap = map[error]int{
-	app.ErrInternal:      http.StatusInternalServerError,
-	app.ErrAgentNotFound: http.StatusNotFound,
+	app.ErrInternal:                        http.StatusInternalServerError,
+	app.ErrAgentNotFound:                   http.StatusNotFound,
+	app.ErrCustomerNotFound:                http.StatusNotFound,
+	app.ErrCustomerAgentConnectionNotFound: http.StatusNotFound,
 }
 
 type errResponse struct {

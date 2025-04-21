@@ -30,6 +30,16 @@ func TestHandlerFindCustomerAgent(t *testing.T) {
 				},
 			},
 		},
+		"no connection found": {
+			wantCode:   http.StatusNotFound,
+			customerID: uuid.New().String(),
+			agentID:    uuid.New().String(),
+			s: &mock.CustomerService{
+				FindCustomerAgentFn: func(ctx context.Context, customerID, agentID uuid.UUID) (app.Agent, error) {
+					return app.Agent{}, app.ErrCustomerAgentConnectionNotFound
+				},
+			},
+		},
 		"internal error": {
 			wantCode:   http.StatusInternalServerError,
 			customerID: uuid.New().String(),
