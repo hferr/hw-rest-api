@@ -31,6 +31,7 @@ func (h *Handler) NewRouter() http.Handler {
 		agents := v1.Group("/agents")
 		{
 			agents.POST("", h.CreateAgent)
+			agents.PATCH("/:id", h.UpdateAgent)
 		}
 	}
 
