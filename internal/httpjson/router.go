@@ -20,6 +20,8 @@ func NewHandler(agentSvc app.AgentService) *Handler {
 func (h *Handler) NewRouter() http.Handler {
 	r := echo.New()
 
+	r.Validator = &Validator{validator: NewValidator()}
+
 	r.GET("/health", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, nil)
 	})
