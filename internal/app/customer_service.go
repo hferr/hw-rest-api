@@ -23,18 +23,12 @@ func NewCustomerService(r Repo) CustomerService {
 func (s *customerService) FindCustomerAgent(ctx context.Context, customerID, agentID uuid.UUID) (Agent, error) {
 	customer, err := s.repo.FindCustomerByID(ctx, customerID)
 	if err != nil {
-		if err == ErrCustomerNotFound {
-			return Agent{}, err
-		}
-		return Agent{}, ErrInternal
+		return Agent{}, err
 	}
 
 	agent, err := s.repo.FindAgentByID(ctx, agentID)
 	if err != nil {
-		if err == ErrAgentNotFound {
-			return Agent{}, err
-		}
-		return Agent{}, ErrInternal
+		return Agent{}, err
 	}
 
 	isCustomerConnectedToAgent, err := s.repo.IsCustomerConnectedToAgent(ctx, customer.ID, agent.ID)
