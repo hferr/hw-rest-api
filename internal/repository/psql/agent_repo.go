@@ -4,8 +4,25 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/hferr/hw-rest-api/internal/app"
 )
+
+const FindAgentByIDQuery = `SELECT * FROM agents WHERE id = $1`
+
+func (r *Repo) FindAgentByID(ctx context.Context, ID uuid.UUID) (app.Agent, error) {
+	row := r.db.QueryRowContext(ctx, FindAgentByIDQuery, ID)
+
+	out, err := mapOutAgentFromRow(row)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return app.Agent{}, app.ErrAgentNotFound
+		}
+		return app.Agent{}, app.ErrInternal
+	}
+
+	return out, nil
+}
 
 const UpsertAgentQuery = `
 	INSERT INTO agents (
