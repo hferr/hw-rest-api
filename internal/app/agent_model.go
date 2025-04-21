@@ -27,3 +27,10 @@ func NewAgent(name, email, phoneNumber, location string) Agent {
 		UpdatedAt:   time.Now(),
 	}
 }
+
+type CreateAgentInput struct {
+	Name        string
+	Email       string
+	PhoneNumber string
+	Location    string
+}
