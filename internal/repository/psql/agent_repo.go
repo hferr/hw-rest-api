@@ -37,7 +37,7 @@ func (r *Repo) UpsertAgent(ctx context.Context, agent app.Agent) (app.Agent, err
 
 	out, err := mapOutAgentFromRow(row)
 	if err != nil {
-		return app.Agent{}, err
+		return app.Agent{}, app.ErrInternal
 	}
 
 	return out, nil
@@ -55,7 +55,7 @@ func mapOutAgentFromRow(row *sql.Row) (app.Agent, error) {
 		&agent.UpdatedAt,
 	)
 	if err != nil {
-		return app.Agent{}, err
+		return app.Agent{}, app.ErrInternal
 	}
 
 	return agent, nil
