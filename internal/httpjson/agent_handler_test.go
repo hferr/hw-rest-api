@@ -17,16 +17,13 @@ import (
 func TestHandlerCreateAgent(t *testing.T) {
 	var testCases = map[string]struct {
 		wantCode int
-		input    httpjson.CreateAgentRequest
+		inputFn  func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest
 		s        *mock.AgentService
 	}{
 		"success": {
 			wantCode: http.StatusCreated,
-			input: httpjson.CreateAgentRequest{
-				Name:        "test_agent",
-				Email:       "test@email.com",
-				PhoneNumber: "111-111-1111",
-				Location:    "test location",
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				return input
 			},
 			s: &mock.AgentService{
 				CreateAgentFn: func(ctx context.Context, input app.CreateAgentInput) (app.Agent, error) {
@@ -36,16 +33,48 @@ func TestHandlerCreateAgent(t *testing.T) {
 		},
 		"internal error": {
 			wantCode: http.StatusInternalServerError,
-			input: httpjson.CreateAgentRequest{
-				Name:        "test_agent",
-				Email:       "test@email.com",
-				PhoneNumber: "111-111-1111",
-				Location:    "test location",
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				return input
 			},
 			s: &mock.AgentService{
 				CreateAgentFn: func(ctx context.Context, input app.CreateAgentInput) (app.Agent, error) {
 					return app.Agent{}, fmt.Errorf("boom")
 				},
+			},
+		},
+		"bad request: 'name' is missing": {
+			wantCode: http.StatusBadRequest,
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				input.Name = ""
+				return input
+			},
+		},
+		"bad request: 'email' is missing": {
+			wantCode: http.StatusBadRequest,
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				input.Email = ""
+				return input
+			},
+		},
+		"bad request: 'email' is invalid": {
+			wantCode: http.StatusBadRequest,
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				input.Email = "invalid_email"
+				return input
+			},
+		},
+		"bad request: 'phone_number' is missing": {
+			wantCode: http.StatusBadRequest,
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				input.PhoneNumber = ""
+				return input
+			},
+		},
+		"bad request: 'location' is missing": {
+			wantCode: http.StatusBadRequest,
+			inputFn: func(input httpjson.CreateAgentRequest) httpjson.CreateAgentRequest {
+				input.Location = ""
+				return input
 			},
 		},
 	}
@@ -56,7 +85,16 @@ func TestHandlerCreateAgent(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			reqJson, err := json.Marshal(tc.input)
+			req := httpjson.CreateAgentRequest{
+				Name:        "test_agent",
+				Email:       "test@email.com",
+				PhoneNumber: "111-111-1111",
+				Location:    "test location",
+			}
+
+			input := tc.inputFn(req)
+
+			reqJson, err := json.Marshal(input)
 			if err != nil {
 				t.Fatal(err)
 			}
