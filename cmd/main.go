@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/hferr/hw-rest-api/config"
+	"github.com/hferr/hw-rest-api/internal/app"
 	"github.com/hferr/hw-rest-api/internal/httpjson"
 	"github.com/hferr/hw-rest-api/internal/repository/psql"
 	"github.com/hferr/hw-rest-api/migrations"
@@ -24,9 +25,17 @@ func main() {
 	}
 	defer db.Close()
 
+	repo := psql.NewRepo(db.Db)
+
+	agentSvc := app.NewAgentService(repo)
+
+	handler := httpjson.NewHandler(
+		agentSvc,
+	)
+
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Server.Port),
-		Handler:      httpjson.NewHandler().NewRouter(),
+		Handler:      handler.NewRouter(),
 		ReadTimeout:  cfg.Server.TimeoutRead,
 		WriteTimeout: cfg.Server.TimeoutWrite,
 		IdleTimeout:  cfg.Server.TimeoutIdle,
