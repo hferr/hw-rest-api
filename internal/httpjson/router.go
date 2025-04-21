@@ -8,12 +8,14 @@ import (
 )
 
 type Handler struct {
-	agentSvc app.AgentService
+	agentSvc    app.AgentService
+	customerSvc app.CustomerService
 }
 
-func NewHandler(agentSvc app.AgentService) *Handler {
+func NewHandler(agentSvc app.AgentService, customerSvc app.CustomerService) *Handler {
 	return &Handler{
-		agentSvc: agentSvc,
+		agentSvc:    agentSvc,
+		customerSvc: customerSvc,
 	}
 }
 
@@ -32,6 +34,10 @@ func (h *Handler) NewRouter() http.Handler {
 		{
 			agents.POST("", h.CreateAgent)
 			agents.PATCH("/:id", h.UpdateAgent)
+		}
+		customers := v1.Group("/customers")
+		{
+			customers.GET("/:customerId/agents/:agentId", h.FindCustomerAgent)
 		}
 	}
 

@@ -28,9 +28,11 @@ func main() {
 	repo := psql.NewRepo(db.Db)
 
 	agentSvc := app.NewAgentService(repo)
+	customerSvc := app.NewCustomerService(repo)
 
 	handler := httpjson.NewHandler(
 		agentSvc,
+		customerSvc,
 	)
 
 	s := &http.Server{
