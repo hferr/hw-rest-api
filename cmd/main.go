@@ -9,6 +9,7 @@ import (
 	"github.com/hferr/hw-rest-api/config"
 	"github.com/hferr/hw-rest-api/internal/httpjson"
 	"github.com/hferr/hw-rest-api/internal/repository/psql"
+	"github.com/hferr/hw-rest-api/migrations"
 )
 
 const fmtDBConnString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
@@ -48,6 +49,10 @@ func initPostgresDb(ctx context.Context, cfg config.CfgDB) (*psql.Postgres, erro
 
 	psql, err := psql.NewPostgresDb(ctx, dbConnString)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := migrations.MaybeApplyMigrations(psql.Db); err != nil {
 		return nil, err
 	}
 
