@@ -1,9 +1,14 @@
 package app
 
-import "context"
+import (
+	"context"
+
+	"github.com/google/uuid"
+)
 
 type AgentService interface {
 	CreateAgent(ctx context.Context, input CreateAgentInput) (Agent, error)
+	UpdateAgent(ctx context.Context, ID uuid.UUID, input UpdateAgentInput) (Agent, error)
 }
 
 type agentService struct {
@@ -25,6 +30,22 @@ func (s *agentService) CreateAgent(ctx context.Context, input CreateAgentInput) 
 	)
 
 	agent, err := s.repo.UpsertAgent(ctx, agent)
+	if err != nil {
+		return Agent{}, err
+	}
+
+	return agent, nil
+}
+
+func (s *agentService) UpdateAgent(ctx context.Context, ID uuid.UUID, input UpdateAgentInput) (Agent, error) {
+	original, err := s.repo.FindAgentByID(ctx, ID)
+	if err != nil {
+		return Agent{}, err
+	}
+
+	updated := original.ApplyUpdate(input)
+
+	agent, err := s.repo.UpsertAgent(ctx, updated)
 	if err != nil {
 		return Agent{}, err
 	}

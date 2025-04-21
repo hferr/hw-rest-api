@@ -16,6 +16,20 @@ type Agent struct {
 	UpdatedAt   time.Time
 }
 
+type CreateAgentInput struct {
+	Name        string
+	Email       string
+	PhoneNumber string
+	Location    string
+}
+
+type UpdateAgentInput struct {
+	Name        *string
+	Email       *string
+	PhoneNumber *string
+	Location    *string
+}
+
 func NewAgent(name, email, phoneNumber, location string) Agent {
 	return Agent{
 		ID:          uuid.New(),
@@ -28,9 +42,22 @@ func NewAgent(name, email, phoneNumber, location string) Agent {
 	}
 }
 
-type CreateAgentInput struct {
-	Name        string
-	Email       string
-	PhoneNumber string
-	Location    string
+func (a Agent) ApplyUpdate(u UpdateAgentInput) Agent {
+	if u.Name != nil {
+		a.Name = *u.Name
+	}
+
+	if u.Email != nil {
+		a.Email = *u.Email
+	}
+
+	if u.PhoneNumber != nil {
+		a.PhoneNumber = *u.PhoneNumber
+	}
+
+	if u.Location != nil {
+		a.Location = *u.Location
+	}
+
+	return a
 }
